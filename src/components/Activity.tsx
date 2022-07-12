@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import { EnrichedActivity, UR } from 'getstream';
 
@@ -23,42 +23,45 @@ export type ActivityProps<
   CT extends UR = UR,
   RT extends UR = UR,
   CRT extends UR = UR
-> = PropsWithElementAttributes<{
-  /** The activity received for stream for which to show the like button. This is
-   * used to initialize the toggle state and the counter. */
-  activity: EnrichedActivity<UT, AT, CT, RT, CRT>;
-  /** Card component to display.
-   * #Card (Component)#
-   */
-  Card?: ElementOrComponentOrLiteralType<CardProps>;
-  /** Content component to display.
-   * #ActivityContent (Component)#
-   */
-  Content?: ElementOrComponentOrLiteralType<ActivityContentProps<UT, AT, CT, RT, CRT>>;
-  /** The feed group part of the feed that the activity should be reposted to
-   * when pressing the RepostButton, e.g. `user` when posting to your own profile
-   * defaults to 'user' feed */
-  feedGroup?: string;
-  Footer?: ElementOrComponentOrLiteralType<ActivityFooterProps<UT, AT, CT, RT, CRT>>;
-  /** Header component to display.
-   * #ActivityHeader (Component)#
-   */
-  Header?: ElementOrComponentOrLiteralType<ActivityHeaderProps<UT, AT>>;
-  HeaderRight?: ElementOrComponentOrLiteralType;
-  icon?: string;
-  /** Handler for any routing you may do on clicks on Hashtags */
-  onClickHashtag?: WordClickHandler;
-  /** Handler for any routing you may do on clicks on Mentions */
-  onClickMention?: WordClickHandler;
-  onClickUser?: (user: UserOrDefaultReturnType<UT>) => void;
-  /** UI component to render original activity within a repost
-   * #Repost (Component)#
-   */
-  Repost?: ElementOrComponentOrLiteralType<ActivityProps<UT, AT, CT, RT, CRT>>;
-  /** The user_id part of the feed that the activity should be reposted to when
-   * pressing the RepostButton */
-  userId?: string;
-}>;
+  > = PropsWithElementAttributes<{
+    /** The activity received for stream for which to show the like button. This is
+     * used to initialize the toggle state and the counter. */
+    activity: EnrichedActivity<UT, AT, CT, RT, CRT>;
+    /** Card component to display.
+     * #Card (Component)#
+     */
+    Card?: ElementOrComponentOrLiteralType<CardProps>;
+    /** Content component to display.
+     * #ActivityContent (Component)#
+     */
+    Content?: ElementOrComponentOrLiteralType<ActivityContentProps<UT, AT, CT, RT, CRT>>;
+    /** The feed group part of the feed that the activity should be reposted to
+     * when pressing the RepostButton, e.g. `user` when posting to your own profile
+     * defaults to 'user' feed */
+    feedGroup?: string;
+    Footer?: ElementOrComponentOrLiteralType<ActivityFooterProps<UT, AT, CT, RT, CRT>>;
+    /** Header component to display.
+     * #ActivityHeader (Component)#
+     */
+    Header?: ElementOrComponentOrLiteralType<ActivityHeaderProps<UT, AT>>;
+    HeaderRight?: ElementOrComponentOrLiteralType;
+    icon?: string;
+    /** Handler for any routing you may do on clicks on Hashtags */
+    onClickHashtag?: WordClickHandler;
+    /** Handler for any routing you may do on clicks on Mentions */
+    onClickMention?: WordClickHandler;
+    onClickUser?: (user: UserOrDefaultReturnType<UT>) => void;
+    /** UI component to render original activity within a repost
+     * #Repost (Component)#
+     */
+    Repost?: ElementOrComponentOrLiteralType<ActivityProps<UT, AT, CT, RT, CRT>>;
+    /** The user_id part of the feed that the activity should be reposted to when
+     * pressing the RepostButton */
+    userId?: string;
+    /***/
+    EditComponent?: ElementOrComponentOrLiteralType<any>;
+    setEdit?: any;
+  }>;
 
 const DefaultRepost = <
   UT extends DefaultUT = DefaultUT,
@@ -104,24 +107,37 @@ export const Activity = <
   feedGroup,
   className,
   style,
-}: ActivityProps<UT, AT, CT, RT, CRT>) => (
-  <div className={classNames('raf-activity', className)} style={style}>
-    {smartRender<ActivityHeaderProps<UT, AT>>(Header, { HeaderRight, icon, activity, onClickUser })}
-    {smartRender<ActivityContentProps<UT, AT, CT, RT, CRT>>(Content, {
-      activity,
-      Content,
-      Card,
-      feedGroup,
-      Footer,
-      Header,
-      HeaderRight,
-      icon,
-      onClickHashtag,
-      onClickMention,
-      onClickUser,
-      Repost,
-      userId,
-    })}
-    {smartRender<ActivityFooterProps<UT, AT, CT, RT, CRT>>(Footer, { activity, feedGroup, userId })}
-  </div>
-);
+  EditComponent
+}: ActivityProps<UT, AT, CT, RT, CRT>) => {
+  const [edit, setEdit] = useState<boolean>(false);
+
+  return (
+    <div className={classNames('raf-activity', className)} style={style}>
+      {
+        edit
+          ?
+            smartRender<ActivityProps<UT, AT, CT, RT, CRT>>(EditComponent, { setEdit, activity, userId })
+          :
+          <>
+            {smartRender<ActivityHeaderProps<UT, AT>>(Header, { HeaderRight, icon, activity, onClickUser, setEdit })}
+            {smartRender<ActivityContentProps<UT, AT, CT, RT, CRT>>(Content, {
+              activity,
+              Content,
+              Card,
+              feedGroup,
+              Footer,
+              Header,
+              HeaderRight,
+              icon,
+              onClickHashtag,
+              onClickMention,
+              onClickUser,
+              Repost,
+              userId,
+            })}
+            {smartRender<ActivityFooterProps<UT, AT, CT, RT, CRT>>(Footer, { activity, feedGroup, userId })}
+          </>
+      }
+    </div>
+  );
+}

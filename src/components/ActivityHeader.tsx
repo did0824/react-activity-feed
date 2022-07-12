@@ -8,7 +8,7 @@ import { UserBar } from './UserBar';
 
 export type ActivityHeaderProps<UT extends DefaultUT = DefaultUT, AT extends DefaultAT = DefaultAT> = Pick<
   ActivityProps<UT, AT>,
-  'activity' | 'HeaderRight' | 'icon' | 'onClickUser' | 'className' | 'style'
+  'activity' | 'HeaderRight' | 'icon' | 'onClickUser' | 'className' | 'style' | 'setEdit'
 >;
 
 export const ActivityHeader = <UT extends DefaultUT = DefaultUT, AT extends DefaultAT = DefaultAT>({
@@ -17,7 +17,7 @@ export const ActivityHeader = <UT extends DefaultUT = DefaultUT, AT extends Defa
   icon,
   onClickUser,
   style = { padding: '8px 16px' },
-  className,
+  className
 }: ActivityHeaderProps<UT, AT>) => {
   const { tDateTimeParser } = useTranslationContext();
 
